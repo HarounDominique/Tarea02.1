@@ -27,8 +27,8 @@ public class AccountMovementSQLServerDao extends AbstractGenericDao<AccountMovem
     public AccountMovement read(int id) throws InstanceNotFoundException {
 
         int accountMovementId;
-        Account cuentaOrigen;
-        Account cuentaDestino;
+        int cuentaOrigenId;
+        int cuentaDestinoId;
         BigDecimal montante;
         Timestamp fechaYHora;
         int contador;
@@ -48,8 +48,8 @@ public class AccountMovementSQLServerDao extends AbstractGenericDao<AccountMovem
             if (result.next()) {
                 contador = 0;
 
-                accountNo = result.getInt(++contador);
-                empno = result.getInt(++contador);
+                cuentaOrigenId = result.getInt(++contador);
+                cuentaDestinoId = result.getInt(++contador);
                 amount = result.getBigDecimal(++contador);
 
                 Empleado empleado = new Empleado();

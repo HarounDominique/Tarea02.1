@@ -6,17 +6,17 @@ public class AccountMovement {
 
     //Fields
     private int accountMovementId;
-    private Account cuentaOrigen;
-    private Account cuentaDestino;
+    private int cuentaOrigenId;
+    private int cuentaDestinoId;
     private BigDecimal montante;
     private Timestamp fechaYHora;
 
     //Constructors
 
-    public AccountMovement(int accountMovementId, Account cuentaOrigen, Account cuentaDestino, BigDecimal montante, Timestamp fechaYHora) {
+    public AccountMovement(int accountMovementId, int cuentaOrigenId, int cuentaDestinoId, BigDecimal montante, Timestamp fechaYHora) {
         this.accountMovementId = accountMovementId;
-        this.cuentaOrigen = cuentaOrigen;
-        this.cuentaDestino = cuentaDestino;
+        this.cuentaOrigenId = cuentaOrigenId;
+        this.cuentaDestinoId = cuentaDestinoId;
         this.montante = montante;
         this.fechaYHora = fechaYHora;
     }
@@ -26,7 +26,6 @@ public class AccountMovement {
 
     //Other methods
 
-
     public int getAccountMovementId() {
         return accountMovementId;
     }
@@ -35,20 +34,20 @@ public class AccountMovement {
         this.accountMovementId = accountMovementId;
     }
 
-    public Account getCuentaOrigen() {
-        return cuentaOrigen;
+    public int getCuentaOrigenId() {
+        return cuentaOrigenId;
     }
 
-    public void setCuentaOrigen(Account cuentaOrigen) {
-        this.cuentaOrigen = cuentaOrigen;
+    public void setCuentaOrigenId(int cuentaOrigenId) {
+        this.cuentaOrigenId = cuentaOrigenId;
     }
 
-    public Account getCuentaDestino() {
-        return cuentaDestino;
+    public int getCuentaDestinoId() {
+        return cuentaDestinoId;
     }
 
-    public void setCuentaDestino(Account cuentaDestino) {
-        this.cuentaDestino = cuentaDestino;
+    public void setCuentaDestinoId(int cuentaDestinoId) {
+        this.cuentaDestinoId = cuentaDestinoId;
     }
 
     public BigDecimal getMontante() {
@@ -71,8 +70,8 @@ public class AccountMovement {
     public String toString() {
         return "AccountMovement{" +
                 "accountMovementId=" + accountMovementId +
-                ", cuentaOrigen=" + cuentaOrigen +
-                ", cuentaDestino=" + cuentaDestino +
+                ", cuentaOrigenId=" + cuentaOrigenId +
+                ", cuentaDestinoId=" + cuentaDestinoId +
                 ", montante=" + montante +
                 ", fechaYHora=" + fechaYHora +
                 '}';
