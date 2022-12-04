@@ -21,8 +21,7 @@ import javax.sql.DataSource;
  *
  * @author maria
  */
-public class AccountSQLServerDao
-        extends AbstractGenericDao<Account> implements IAccountDao {
+public class AccountSQLServerDao extends AbstractGenericDao<Account> implements IAccountDao {
 
     private DataSource dataSource;
 

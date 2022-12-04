@@ -47,8 +47,5 @@ public class Account {
     public void setMontante(BigDecimal montante) {
         this.montante = montante;
     }
-    
-    
-    
-    
+
 }
