@@ -9,6 +9,7 @@ import es.teis.ud2.exceptions.InstanceNotFoundException;
 import es.teis.ud2.model.Account;
 import es.teis.ud2.model.Empleado;
 import es.teis.ud2.model.dao.AbstractGenericDao;
+
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -18,7 +19,6 @@ import java.sql.Statement;
 import javax.sql.DataSource;
 
 /**
- *
  * @author maria
  */
 public class AccountSQLServerDao extends AbstractGenericDao<Account> implements IAccountDao {
@@ -33,11 +33,11 @@ public class AccountSQLServerDao extends AbstractGenericDao<Account> implements 
     public Account create(Account entity) {
 
         try (
-                 Connection conexion = this.dataSource.getConnection();  PreparedStatement pstmt = conexion.prepareStatement(
+                Connection conexion = this.dataSource.getConnection(); PreparedStatement pstmt = conexion.prepareStatement(
                 "INSERT INTO [dbo].[ACCOUNT]\n"
-                + "           ([EMPNO]\n"
-                + "           ,[AMOUNT])\n"
-                + "     VALUES (?, ?)", Statement.RETURN_GENERATED_KEYS
+                        + "           ([EMPNO]\n"
+                        + "           ,[AMOUNT])\n"
+                        + "     VALUES (?, ?)", Statement.RETURN_GENERATED_KEYS
         );) {
 
             pstmt.setInt(1, entity.getEmpleado().getEmpleadoId());
@@ -73,12 +73,12 @@ public class AccountSQLServerDao extends AbstractGenericDao<Account> implements 
         Account cuenta = null;
 
         try (
-                 Connection conexion = this.dataSource.getConnection();  PreparedStatement sentencia
+                Connection conexion = this.dataSource.getConnection(); PreparedStatement sentencia
                 = conexion.prepareStatement("SELECT  [ACCOUNTNO]\n"
-                        + "      ,[EMPNO]\n"
-                        + "      ,[AMOUNT]\n"
-                        + "  FROM [empresa].[dbo].[ACCOUNT]"
-                        + "WHERE ACCOUNTNO=?");) {
+                + "      ,[EMPNO]\n"
+                + "      ,[AMOUNT]\n"
+                + "  FROM [empresa].[dbo].[ACCOUNT]"
+                + "WHERE ACCOUNTNO=?");) {
             sentencia.setInt(1, id);
 
             ResultSet result = sentencia.executeQuery();
@@ -110,10 +110,10 @@ public class AccountSQLServerDao extends AbstractGenericDao<Account> implements 
         boolean actualizado = false;
         //no vamos a actualizar el empledo
         try (
-                 Connection conexion = this.dataSource.getConnection();  PreparedStatement pstmt = conexion.prepareStatement(
+                Connection conexion = this.dataSource.getConnection(); PreparedStatement pstmt = conexion.prepareStatement(
                 "UPDATE [dbo].[ACCOUNT]\n"
-                + "   SET [AMOUNT] = ? \n"
-                + " WHERE ACCOUNTNO = ?")) {
+                        + "   SET [AMOUNT] = ? \n"
+                        + " WHERE ACCOUNTNO = ?")) {
 
             pstmt.setBigDecimal(1, entity.getMontante());
             pstmt.setInt(2, entity.getAccountId());
@@ -134,7 +134,7 @@ public class AccountSQLServerDao extends AbstractGenericDao<Account> implements 
     public boolean delete(int id) {
         int result = 0;
         try (
-                 Connection conexion = this.dataSource.getConnection();  PreparedStatement pstmt = conexion.prepareStatement("DELETE FROM ACCOUNT WHERE ACCOUNTNO=?");) {
+                Connection conexion = this.dataSource.getConnection(); PreparedStatement pstmt = conexion.prepareStatement("DELETE FROM ACCOUNT WHERE ACCOUNTNO=?");) {
 
             pstmt.setInt(1, id);
 
@@ -149,30 +149,34 @@ public class AccountSQLServerDao extends AbstractGenericDao<Account> implements 
     }
 
     @Override
-    public boolean transferir(int accIdOrigen, int accIdDestino, BigDecimal amount) {
+    public int transferir(int accIdOrigen, int accIdDestino, BigDecimal amount) {
 
         Connection con = null;
         boolean exito = false;
+        int movId = 0;
         try {
             con = this.dataSource.getConnection();
 
-            try ( PreparedStatement updateOrigen = con.prepareStatement("UPDATE [dbo].[ACCOUNT]\n"
+            try (PreparedStatement updateOrigen = con.prepareStatement("UPDATE [dbo].[ACCOUNT]\n"
                     + "   SET [AMOUNT] = (AMOUNT - ?) \n"
-                    + " WHERE ACCOUNTNO = ?");  PreparedStatement updateDestino = con.prepareStatement("UPDATE [dbo].[ACCOUNT]\n"
-                            + "   SET [AMOUNT] = (AMOUNT + ?) \n"
-                            + " WHERE ACCOUNTNO = ?");  PreparedStatement insertMov = con.prepareStatement("INSERT INTO [dbo].[ACC_MOVEMENT]\n"
-                            + "           ([ACCOUNT_ORIGIN_ID]\n"
-                            + "           ,[ACCOUNT_DEST_ID]\n"
-                            + "           ,[AMOUNT]\n"
-                            + "           ,[DATETIME])\n"
-                            + "     VALUES\n"
-                            + "           (?, ?, ?, GETDATE())", Statement.RETURN_GENERATED_KEYS);  PreparedStatement selectMov = con.prepareStatement("SELECT \n"
-                            + "      ,[ACCOUNT_ORIGIN_ID]\n"
-                            + "      ,[ACCOUNT_DEST_ID]\n"
-                            + "      ,[AMOUNT]\n"
-                            + "      ,[DATETIME]\n"
-                            + "  FROM [dbo].[ACC_MOVEMENT]\n"
-                            + " [ACCOUNT_MOV_ID]=?", Statement.RETURN_GENERATED_KEYS);) {
+                    + " WHERE ACCOUNTNO = ?");
+                 PreparedStatement updateDestino = con.prepareStatement("UPDATE [dbo].[ACCOUNT]\n"
+                         + "   SET [AMOUNT] = (AMOUNT + ?) \n"
+                         + " WHERE ACCOUNTNO = ?");
+                 PreparedStatement insertMov = con.prepareStatement("INSERT INTO [dbo].[ACC_MOVEMENT]\n"
+                         + "           ([ACCOUNT_ORIGIN_ID]\n"
+                         + "           ,[ACCOUNT_DEST_ID]\n"
+                         + "           ,[AMOUNT]\n"
+                         + "           ,[DATETIME])\n"
+                         + "     VALUES\n"
+                         + "           (?, ?, ?, GETDATE())", movId = Statement.RETURN_GENERATED_KEYS);
+                 PreparedStatement selectMov = con.prepareStatement("SELECT \n"
+                         + "      ,[ACCOUNT_ORIGIN_ID]\n"
+                         + "      ,[ACCOUNT_DEST_ID]\n"
+                         + "      ,[AMOUNT]\n"
+                         + "      ,[DATETIME]\n"
+                         + "  FROM [dbo].[ACC_MOVEMENT]\n"
+                         + " [ACCOUNT_MOV_ID]=?", Statement.RETURN_GENERATED_KEYS);) {
                 con.setAutoCommit(false);
 
                 updateOrigen.setBigDecimal(1, amount);
@@ -214,7 +218,11 @@ public class AccountSQLServerDao extends AbstractGenericDao<Account> implements 
                 }
             }
         }
-        return exito;
+        if (!exito) {
+            return -1;
+        } else {
+            return movId;
+        }
     }
 
 }
