@@ -33,11 +33,13 @@ public class AccountMovementSQLServerDao extends AbstractGenericDao<AccountMovem
         Timestamp fechaYHora;
         int contador;
 
+        AccountMovement movimiento = null;
 
         try (
                 Connection conexion = this.dataSource.getConnection();
-                PreparedStatement sentencia = conexion.prepareStatement("SELECT  [ACCOUNT_ORIGIN_ID]\n"
+                PreparedStatement sentencia = conexion.prepareStatement("SELECT  [ACCOUNT_MOV_ID]\n"
                 + "      ,[ACCOUNT_DEST_ID]\n"
+                + "      ,[ACCOUNT_ORIGIN_ID]\n"
                 + "      ,[AMOUNT]\n"
                 + "      ,[DATETIME]\n"
                 + "  FROM [empresa].[dbo].[ACC_MOVEMENT]"
@@ -48,13 +50,17 @@ public class AccountMovementSQLServerDao extends AbstractGenericDao<AccountMovem
             if (result.next()) {
                 contador = 0;
 
+                accountMovementId = result.getInt(++contador);
                 cuentaOrigenId = result.getInt(++contador);
                 cuentaDestinoId = result.getInt(++contador);
-                amount = result.getBigDecimal(++contador);
+                montante = result.getBigDecimal(++contador);
+                fechaYHora = result.getTimestamp(++contador);
 
-                Empleado empleado = new Empleado();
-                empleado.setEmpleadoId(empno);
-                cuenta = new Account(accountNo, empleado, amount);
+                Account cuentaOrigen = new Account();
+                Account cuentaDestino = new Account();
+                cuentaOrigen.setAccountId(cuentaOrigenId);
+                cuentaDestino.setAccountId(cuentaDestinoId);
+                movimiento = new AccountMovement(accountMovementId, cuentaOrigenId, cuentaDestinoId, montante, fechaYHora);
 
             } else {
                 throw new InstanceNotFoundException(id, getEntityClass());
@@ -65,7 +71,7 @@ public class AccountMovementSQLServerDao extends AbstractGenericDao<AccountMovem
             System.err.println("Ha ocurrido una excepción: " + ex.getMessage());
 
         }
-        return cuenta;
+        return movimiento;
     }
 
     @Override
