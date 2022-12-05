@@ -44,6 +44,7 @@ public class AccountMovementSQLServerDao extends AbstractGenericDao<AccountMovem
                 + "      ,[DATETIME]\n"
                 + "  FROM [empresa].[dbo].[ACC_MOVEMENT]"
                 + "WHERE ACCOUNT_MOV_ID=?");) {
+
             sentencia.setInt(1, id);
 
             ResultSet result = sentencia.executeQuery();

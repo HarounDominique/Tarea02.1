@@ -40,36 +40,47 @@ public class EmpleadoService implements IEmpleadoServicio {
             throws SaldoInsuficienteException, InstanceNotFoundException, UnsupportedOperationException {
         boolean exito = false;
         Connection con = null;
-        int movId = 0;
+        BigDecimal ammount = cantidad;
+        int contador=0;
+
+
+        if (ammount.longValue() <= 0) {
+            throw new UnsupportedOperationException();
+        }
+
         try {
             con = this.dataSource.getConnection();
 
             try (PreparedStatement updateOrigen = con.prepareStatement("UPDATE [dbo].[ACCOUNT]\n"
                     + "   SET [AMOUNT] = (AMOUNT - ?) \n"
-                    + " WHERE ACCOUNTNO = ?");
+                    + " WHERE EMPNO = ?");
                  PreparedStatement updateDestino = con.prepareStatement("UPDATE [dbo].[ACCOUNT]\n"
                          + "   SET [AMOUNT] = (AMOUNT + ?) \n"
-                         + " WHERE ACCOUNTNO = ?");
+                         + " WHERE EMPNO = ?");
                  PreparedStatement insertMov = con.prepareStatement("INSERT INTO [dbo].[ACC_MOVEMENT]\n"
                          + "           ([ACCOUNT_ORIGIN_ID]\n"
                          + "           ,[ACCOUNT_DEST_ID]\n"
                          + "           ,[AMOUNT]\n"
                          + "           ,[DATETIME])\n"
                          + "     VALUES\n"
-                         + "           (?, ?, ?, GETDATE())", movId = Statement.RETURN_GENERATED_KEYS);) {
+                         + "           (?, ?, ?, GETDATE())", Statement.RETURN_GENERATED_KEYS);) {
                 con.setAutoCommit(false);
 
-                updateOrigen.setBigDecimal(1, amount);
-                updateOrigen.setInt(2, accIdOrigen);
+                updateOrigen.setBigDecimal(1, cantidad);
+                updateOrigen.setInt(2, empnoOrigen);
                 updateOrigen.executeUpdate();
 
-                updateDestino.setBigDecimal(1, amount);
-                updateDestino.setInt(2, accIdDestino);
+                updateDestino.setBigDecimal(1, cantidad);
+                updateDestino.setInt(2, empnoDestino);
                 updateDestino.executeUpdate();
 
-                insertMov.setInt(1, accIdOrigen);
-                insertMov.setInt(2, accIdDestino);
-                insertMov.setBigDecimal(3, amount);
+                int sourceAccId = findAccountByEmployeeId(empnoOrigen);
+                int destinationAccId = findAccountByEmployeeId(empnoDestino);
+
+
+                insertMov.setInt(1, sourceAccId);
+                insertMov.setInt(2, destinationAccId);
+                insertMov.setBigDecimal(3, cantidad);
 
                 insertMov.executeUpdate();
 
@@ -109,7 +120,7 @@ public class EmpleadoService implements IEmpleadoServicio {
             }
         }
         if (!exito) {
-            return -1;
+            return null;
         } else {
             return movId;
         }
