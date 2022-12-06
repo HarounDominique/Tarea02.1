@@ -40,11 +40,14 @@ public class EmpleadoService implements IEmpleadoServicio {
             throws SaldoInsuficienteException, InstanceNotFoundException, UnsupportedOperationException {
         boolean exito = false;
         Connection con = null;
-        BigDecimal ammount = cantidad;
-        int contador=0;
+        BigDecimal montante = cantidad;
+        java.sql.Timestamp fechaYHora = null;
+        int movimientoId = 0;
+        AccountMovement movimientoCuenta = null;
+        int contador = 0;
 
 
-        if (ammount.longValue() <= 0) {
+        if (montante.longValue() <= 0) {
             throw new UnsupportedOperationException();
         }
 
@@ -63,7 +66,13 @@ public class EmpleadoService implements IEmpleadoServicio {
                          + "           ,[AMOUNT]\n"
                          + "           ,[DATETIME])\n"
                          + "     VALUES\n"
-                         + "           (?, ?, ?, GETDATE())", Statement.RETURN_GENERATED_KEYS);) {
+                         + "           (?, ?, ?, GETDATE())", movimientoId = Statement.RETURN_GENERATED_KEYS);
+                 PreparedStatement selectMov = con.prepareStatement("SELECT [ACCOUNT_MOV_ID]\n" +
+                         "      ,[ACCOUNT_ORIGIN_ID]\n" +
+                         "      ,[ACCOUNT_DEST_ID]\n" +
+                         "      ,[AMOUNT]\n" +
+                         "      ,[DATETIME]\n" +
+                         "  FROM [dbo].[ACC_MOVEMENT]")) {
                 con.setAutoCommit(false);
 
                 updateOrigen.setBigDecimal(1, cantidad);
@@ -83,6 +92,30 @@ public class EmpleadoService implements IEmpleadoServicio {
                 insertMov.setBigDecimal(3, cantidad);
 
                 insertMov.executeUpdate();
+
+                selectMov.executeQuery();
+
+                ResultSet result = selectMov.executeQuery();
+                if (result.next()) {
+                    contador = 0;
+
+                    movimientoId = result.getInt(++contador);
+                    sourceAccId = result.getInt(++contador);
+                    destinationAccId = result.getInt(++contador);
+                    montante = result.getBigDecimal(++contador);
+                    fechaYHora = result.getTimestamp(++contador);
+                    /*
+                    Account cuentaOrigen = new Account();
+                    Account cuentaDestino = new Account();
+                    cuentaOrigen.setAccountId(cuentaOrigenId);
+                    cuentaDestino.setAccountId(cuentaDestinoId);
+                     */
+
+                } else {
+                    System.out.println("¯\\_(ツ)_/¯");
+                }
+
+                movimientoCuenta = new AccountMovement(movimientoId, sourceAccId, destinationAccId, montante, fechaYHora);
 
                 con.commit();
 
@@ -122,7 +155,7 @@ public class EmpleadoService implements IEmpleadoServicio {
         if (!exito) {
             return null;
         } else {
-            return movId;
+            return movimientoCuenta;
         }
     }
 
