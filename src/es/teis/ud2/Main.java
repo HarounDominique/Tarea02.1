@@ -4,8 +4,11 @@
  */
 package es.teis.ud2;
 
+import es.teis.ud2.exceptions.InstanceNotFoundException;
+import es.teis.ud2.exceptions.SaldoInsuficienteException;
 import es.teis.ud2.model.AccountMovement;
 import es.teis.ud2.model.dao.account.AccountSQLServerDao;
+import es.teis.ud2.services.empleado.EmpleadoService;
 
 import java.math.BigDecimal;
 
@@ -24,11 +27,20 @@ public class Main {
     }
 
 
-    private static AccountMovement transferirDineroEntreEmpleados(int empnoOrigen, int empnoDestino, BigDecimal cantidad) {
+    private static AccountMovement transferirDineroEntreEmpleados(int empnoOrigen, int empnoDestino, BigDecimal cantidad){
         AccountMovement accMovement = null;
         //Completa para crear el servicio  y llamar a su método  transferir(int empnoOrigen, int empnoDestino, BigDecimal cantidad)
+        EmpleadoService es = new EmpleadoService();
+
+        try {
+            accMovement = es.transferir(empnoOrigen, empnoDestino, cantidad);
+        } catch (SaldoInsuficienteException e) {
+            throw new RuntimeException(e);
+        } catch (InstanceNotFoundException e) {
+            throw new RuntimeException(e);
+        }
         AccountSQLServerDao accountDao = new AccountSQLServerDao();
         accountDao.transferir(empnoOrigen, empnoDestino, cantidad);
-        return accMovement;//No logro devolver un objeto AccountMovement dado que el método transferir devuelve un int identificador
+        return accMovement;
     }
 }

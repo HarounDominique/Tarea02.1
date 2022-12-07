@@ -23,11 +23,11 @@ public class EmpleadoService implements IEmpleadoServicio {
     private DataSource dataSource;
 
     private IEmpleadoDao empleadoDao;
-
+/*
     public EmpleadoService(IEmpleadoDao empleadoDao) {
         this.empleadoDao = empleadoDao;
-
     }
+*/
 
     @Override
     public Empleado create(Empleado empleado) {
@@ -104,12 +104,6 @@ public class EmpleadoService implements IEmpleadoServicio {
                     destinationAccId = result.getInt(++contador);
                     montante = result.getBigDecimal(++contador);
                     fechaYHora = result.getTimestamp(++contador);
-                    /*
-                    Account cuentaOrigen = new Account();
-                    Account cuentaDestino = new Account();
-                    cuentaOrigen.setAccountId(cuentaOrigenId);
-                    cuentaDestino.setAccountId(cuentaDestinoId);
-                     */
 
                 } else {
                     System.out.println("¯\\_(ツ)_/¯");
